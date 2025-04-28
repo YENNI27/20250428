@@ -9,9 +9,7 @@ function setup() {
 
   // 建立與視訊畫面一樣大小的背景 Graphics
   backgroundGraphics = createGraphics(capture.width, capture.height);
-  backgroundGraphics.fill(200, 200, 255); // 填充顏色
-  backgroundGraphics.noStroke();
-  backgroundGraphics.rect(0, 0, backgroundGraphics.width, backgroundGraphics.height); // 畫一個矩形
+  drawGraphics(); // 繪製背景內容
 }
 
 function draw() {
@@ -42,7 +40,18 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight); // 當視窗大小改變時調整畫布
   capture.size(windowWidth * 0.8, windowHeight * 0.8); // 更新影像大小
   backgroundGraphics = createGraphics(capture.width, capture.height); // 更新背景 Graphics 大小
-  backgroundGraphics.fill(200, 200, 255); // 填充顏色
-  backgroundGraphics.noStroke();
-  backgroundGraphics.rect(0, 0, backgroundGraphics.width, backgroundGraphics.height); // 重新繪製背景
+  drawGraphics(); // 重新繪製背景內容
+}
+
+function drawGraphics() {
+  backgroundGraphics.background(0); // 設定背景為黑色
+  for (let x = 0; x < backgroundGraphics.width; x += 20) {
+    for (let y = 0; y < backgroundGraphics.height; y += 20) {
+      // 從 capture 中取得顏色
+      let col = capture.get(x, y);
+      backgroundGraphics.fill(col); // 設定圓形顏色
+      backgroundGraphics.noStroke();
+      backgroundGraphics.ellipse(x + 10, y + 10, 15, 15); // 繪製圓形
+    }
+  }
 }
