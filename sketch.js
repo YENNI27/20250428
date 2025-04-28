@@ -45,13 +45,17 @@ function windowResized() {
 
 function drawGraphics() {
   backgroundGraphics.background(0); // 設定背景為黑色
-  for (let x = 0; x < backgroundGraphics.width; x += 20) {
-    for (let y = 0; y < backgroundGraphics.height; y += 20) {
-      // 從 capture 中取得顏色
-      let col = capture.get(x, y);
-      backgroundGraphics.fill(col); // 設定圓形顏色
-      backgroundGraphics.noStroke();
-      backgroundGraphics.ellipse(x + 10, y + 10, 15, 15); // 繪製圓形
+
+  // 確保 capture 已準備好
+  if (capture.loadedmetadata) {
+    for (let x = 0; x < backgroundGraphics.width; x += 20) {
+      for (let y = 0; y < backgroundGraphics.height; y += 20) {
+        // 從 capture 中取得顏色
+        let col = capture.get(x, y);
+        backgroundGraphics.fill(col); // 設定圓形顏色
+        backgroundGraphics.noStroke();
+        backgroundGraphics.ellipse(x + 10, y + 10, 15, 15); // 繪製圓形
+      }
     }
   }
 }
