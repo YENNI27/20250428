@@ -1,48 +1,74 @@
 let capture;
-let overlayGraphics;
+let backgroundGraphics;
+let captureReady = false;
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
-    background('#a9def9');
+  createCanvas(windowWidth, windowHeight);
+  background(0);
+  textAlign(CENTER, CENTER);
+  textSize(24);
+  fill(255);
+  text("請點擊以啟動相機", width / 2, height / 2);
+}
 
-    capture = createCapture(VIDEO);
+function mousePressed() {
+  if (!captureReady) {
+    startCapture();
+    captureReady = true;
+  }
+}
+
+function startCapture() {
+  capture = createCapture(VIDEO, () => {
     capture.size(windowWidth * 0.8, windowHeight * 0.8);
     capture.hide();
-
-    overlayGraphics = createGraphics(capture.width, capture.height);
-    overlayGraphics.clear();
+    backgroundGraphics = createGraphics(capture.width, capture.height);
+    drawGraphics();
+  });
 }
 
 function draw() {
-    background('#a9def9');
+  if (captureReady && capture) {
+    // 顯示背景
+    image(backgroundGraphics, (width - capture.width) / 2, (height - capture.height) / 2, capture.width, capture.height);
 
-    // 更新 overlayGraphics 的內容
-    overlayGraphics.clear();
-    overlayGraphics.background(0); // 設定背景為黑色
-
-    // 每隔 20 繪製圓形，顏色取自 capture 的相對位置
-    for (let y = 0; y < overlayGraphics.height; y += 20) {
-        for (let x = 0; x < overlayGraphics.width; x += 20) {
-            let col = capture.get(x, y); // 從攝影機影像取得顏色
-            overlayGraphics.fill(col); // 設定圓形顏色
-            overlayGraphics.noStroke();
-            overlayGraphics.ellipse(x + 10, y + 10, 15, 15); // 繪製圓形，中心偏移 10
-        }
-    }
-
-    // 顯示攝影機影像
+    // 顯示翻轉的攝影機畫面
     push();
     translate(width / 2, height / 2);
     scale(-1, 1);
     image(capture, -capture.width / 2, -capture.height / 2, capture.width, capture.height);
     pop();
-
-    // 疊加 overlayGraphics
-    let x = (width - capture.width) / 2;
-    let y = (height - capture.height) / 2;
-    image(overlayGraphics, x, y, capture.width, capture.height);
+  }
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
+  resizeCanvas(windowWidth, windowHeight);
+  if (capture) {
+    capture.size(windowWidth * 0.8, windowHeight * 0.8);
+    backgroundGraphics = createGraphics(capture.width, capture.height);
+    drawGraphics();
+  }
+}
+
+function drawGraphics() {
+  if (capture) {
+    backgroundGraphics.background(0);
+    backgroundGraphics.noStroke();
+    capture.loadPixels();
+    if (capture.pixels.length > 0) {
+      for (let x = 0; x < capture.width; x += 20) {
+        for (let y = 0; y < capture.height; y += 20) {
+          let i = (y * capture.width + x) * 4;
+          let col = color(
+            capture.pixels[i],
+            capture.pixels[i + 1],
+            capture.pixels[i + 2],
+            capture.pixels[i + 3]
+          );
+          backgroundGraphics.fill(col);
+          backgroundGraphics.ellipse(x + 10, y + 10, 15, 15);
+        }
+      }
+    }
+  }
 }
