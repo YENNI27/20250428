@@ -48,14 +48,18 @@ function drawGraphics() {
 
   // 確保 capture 已準備好
   if (capture.loadedmetadata) {
+    capture.loadPixels(); // 確保 capture 的像素數據已更新
     for (let x = 0; x < backgroundGraphics.width; x += 20) {
       for (let y = 0; y < backgroundGraphics.height; y += 20) {
-        // 從 capture 中取得顏色
-        let col = capture.get(x, y);
-        let gray = (red(col) + green(col) + blue(col)) / 3; // 計算灰階值
-        backgroundGraphics.fill(gray); // 設定圓形顏色為灰階
-        backgroundGraphics.noStroke();
-        backgroundGraphics.ellipse(x + 10, y + 10, 15, 15); // 繪製圓形
+        // 確保座標在範圍內
+        if (x < capture.width && y < capture.height) {
+          // 從 capture 中取得顏色
+          let col = capture.get(x, y);
+          let gray = (red(col) + green(col) + blue(col)) / 3; // 計算灰階值
+          backgroundGraphics.fill(gray); // 設定圓形顏色為灰階
+          backgroundGraphics.noStroke();
+          backgroundGraphics.ellipse(x + 10, y + 10, 15, 15); // 繪製圓形
+        }
       }
     }
   }
